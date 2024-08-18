@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>Application Submitted</title>
-    <link rel="icon" type="image/jpeg" href="images/TCS Favicon.jpeg">
+	<link rel="icon" type="image/png" href="images/tcslogo.png">
     
     <style>
         body {
