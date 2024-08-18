@@ -4,6 +4,8 @@
 <html>
 <head>
     <title>Application Submitted</title>
+    <link rel="icon" type="image/jpeg" href="images/TCS Favicon.jpeg">
+    
     <style>
         body {
             font-family: Arial, sans-serif;

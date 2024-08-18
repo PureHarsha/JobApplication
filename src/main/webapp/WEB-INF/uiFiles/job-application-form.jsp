@@ -4,6 +4,8 @@
 <html>
 <head>
     <title>Job Application Form</title>
+<link rel="icon" type="image/jpeg" href="images/TCS Favicon.jpeg">
+    
     <style>
         /* General body styling */
         body {
