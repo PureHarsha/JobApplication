@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>Application Submitted</title>
-	<link rel="icon" type="image/png" href="images/tcslogo.png">
+    <link rel="icon" type="image/png" href="images/tcslogo.png">
     
     <style>
         body {
@@ -42,6 +42,7 @@
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
+            margin: 5px;
         }
         .button:hover {
             background-color: #0056b3;
@@ -53,6 +54,7 @@
         <h1>Application Submitted</h1>
         <p>Thank you for applying! Your application has been submitted successfully.</p>
         <a href="${pageContext.request.contextPath}/" class="button">Send New Application</a>
+        <a href="${pageContext.request.contextPath}/verify-pin" class="button">View Job Applications</a>
     </div>
 </body>
 </html>

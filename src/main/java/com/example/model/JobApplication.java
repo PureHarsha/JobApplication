@@ -2,14 +2,19 @@ package com.example.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 @Entity(name = "JOB_APPLICATION")
 public class JobApplication {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_application_seq")
+    @SequenceGenerator(name = "job_application_seq", sequenceName = "job_application_seq", allocationSize = 1)
     @Column(name = "ID")
-    private int id;  // Changed to int as per your updated requirement
+    private int id;  // ID will be managed by sequence and trigger
 
     @Column(name = "NAME")
     private String name;

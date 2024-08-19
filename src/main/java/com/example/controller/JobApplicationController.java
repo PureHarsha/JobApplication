@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.model.JobApplication;
 import com.example.service.JobApplicationService;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,8 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/")
@@ -24,6 +30,7 @@ public class JobApplicationController {
 
     // Directory to save uploaded files
     private final String UPLOAD_DIR = "D:/JobApplicationForms/";
+    private static final String ADMIN_PIN = "1234"; // Example PIN for demonstration
 
     @GetMapping
     public String showForm(Model model) {
@@ -74,5 +81,43 @@ public class JobApplicationController {
         // Save the application using the service
         service.saveApplication(application);
         return "application-success";
+    }
+
+    @GetMapping("/download")
+    public void downloadResume(@RequestParam("fileName") String fileName, HttpServletResponse response) throws IOException {
+        File file = new File(UPLOAD_DIR + fileName);
+        if (file.exists()) {
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            FileInputStream fis = new FileInputStream(file);
+            IOUtils.copy(fis, response.getOutputStream());
+            response.flushBuffer();
+            fis.close();
+        }
+    }
+
+    @GetMapping("/applications")
+    public String showApplications(Model model) {
+        List<JobApplication> jobApplications = service.getAllApplications();
+        model.addAttribute("jobApplications", jobApplications);
+        return "job-applications"; // JSP page name
+    }
+
+    @GetMapping("/verify-pin")
+    public String showPinVerificationPage(Model model) {
+        // Optional: Add model attributes if needed for the view
+        return "verify-pin"; // JSP page for pin verification
+    }
+
+    @PostMapping("/verify-pin")
+    public String verifyPin(@RequestParam("pin") String pin, Model model) {
+        if (ADMIN_PIN.equals(pin)) {
+            List<JobApplication> jobApplications = service.getAllApplications();
+            model.addAttribute("jobApplications", jobApplications);
+            return "job-applications"; // JSP page name for displaying job applications
+        } else {
+            model.addAttribute("error", "Invalid PIN. Please try again.");
+            return "verify-pin"; // Return to pin verification page with error
+        }
     }
 }
