@@ -5,6 +5,7 @@ import com.example.service.JobApplicationService;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
@@ -27,6 +29,8 @@ public class JobApplicationController {
 
     @Autowired
     private JobApplicationService service;
+    @Autowired
+    private ServletContext servletContext; // Injecting ServletContext
 
     // Directory to save uploaded files
     private final String UPLOAD_DIR = "D:/JobApplicationForms/";
@@ -95,6 +99,29 @@ public class JobApplicationController {
             fis.close();
         }
     }
+    
+    
+    @GetMapping("/view-resume")
+    public void viewResume(@RequestParam("fileName") String fileName, HttpServletResponse response) throws IOException {
+        File file = new File(UPLOAD_DIR + fileName);
+        if (file.exists()) {
+            String mimeType = servletContext.getMimeType(file.getName());
+            if (mimeType == null) {
+                mimeType = "application/octet-stream"; // Fallback MIME type
+            }
+            response.setContentType(mimeType);
+            response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
+
+            try (FileInputStream fis = new FileInputStream(file)) {
+                IOUtils.copy(fis, response.getOutputStream());
+                response.flushBuffer();
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+        }
+    }
+
+
 
     @GetMapping("/applications")
     public String showApplications(Model model) {
@@ -103,6 +130,17 @@ public class JobApplicationController {
         return "job-applications"; // JSP page name
     }
 
+    @PostMapping("/delete-application")
+    public String deleteApplication(@RequestParam("id") Integer id, Model model) {
+        try {
+            service.deleteApplication(id);
+        } catch (EmptyResultDataAccessException e) {
+            model.addAttribute("error", "Application with ID " + id + " does not exist.");
+        }
+        return "redirect:/applications"; // Redirect to the list of applications
+    }
+
+    
     @GetMapping("/verify-pin")
     public String showPinVerificationPage(Model model) {
         // Optional: Add model attributes if needed for the view
